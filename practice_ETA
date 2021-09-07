@@ -1,3 +1,4 @@
+
 import traceback
 from typing import Tuple,List
 import requests
@@ -19,16 +20,17 @@ def calculate_eta(long_lat_list: List[List[float]],
     '''
     distance_km = 0
     eta_seconds = 0
+    response = None
     try:
         request_json = {
             "coordinates": long_lat_list,
             "geometry": False,
             "units": distance_unit,
-            "maximum_speed": maximum_speed
         }
-        response = requests.post('https://routing.rodcast.co.in/ors/v2/directions/driving-car', json = request_json)
+        response = requests.post('https://routing.roadcast.co.in/ors/v2/directions/driving-car', json = request_json)
+
         if response.status_code == 200:
-            route_summary = response.json()['route'][0]['summary']
+            route_summary = response.json()['routes'][0]['summary']
             distance_km = route_summary['distance']
             eta_seconds = route_summary['duration']
         else:
@@ -37,6 +39,7 @@ def calculate_eta(long_lat_list: List[List[float]],
 
     except:
         print(traceback.format_exc())
+        print(response.json())
 
     return distance_km, eta_seconds
 
