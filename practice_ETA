@@ -1,0 +1,44 @@
+import traceback
+from typing import Tuple,List
+import requests
+
+
+def calculate_eta(long_lat_list: List[List[float]],
+            maximum_speed: int = 90,
+            distance_unit: str = 'km') -> Tuple[float, int]:
+    '''
+
+    Args:
+        start_latitude:
+        start_longitude:
+        end_latitude:
+        end_longitude:
+
+    Returns:
+
+    '''
+    distance_km = 0
+    eta_seconds = 0
+    try:
+        request_json = {
+            "coordinates": long_lat_list,
+            "geometry": False,
+            "units": distance_unit,
+            "maximum_speed": maximum_speed
+        }
+        response = requests.post('https://routing.rodcast.co.in/ors/v2/directions/driving-car', json = request_json)
+        if response.status_code == 200:
+            route_summary = response.json()['route'][0]['summary']
+            distance_km = route_summary['distance']
+            eta_seconds = route_summary['duration']
+        else:
+            print(request_json)
+            print(response.status_code,response.text)
+
+    except:
+        print(traceback.format_exc())
+
+    return distance_km, eta_seconds
+
+distance_km, eta_seconds = calculate_eta([[80.9462,26.8467],[77.1025, 28.7041]])
+print(distance_km, eta_seconds)
